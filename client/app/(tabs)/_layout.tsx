@@ -1,17 +1,18 @@
+import React from 'react';
 import { Tabs } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Button, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
+import { useAuth } from '../../context/AuthContext';
 
 export default function TabLayout() {
   const router = useRouter();
+  const { logout } = useAuth();
 
   const handleLogout = async () => {
     try {
-      await AsyncStorage.removeItem('authToken'); // Remove o token
-      Alert.alert('Sucesso', 'Logout realizado com sucesso!');
-      router.replace('/auth'); // Redireciona para a tela de login
+      await logout(); // Usando a função de logout do contexto
     } catch (error) {
       Alert.alert('Erro', 'Erro ao realizar logout.');
     }
@@ -46,13 +47,12 @@ export default function TabLayout() {
       <Tabs.Screen
         name="chat"
         options={{
-          title: 'artificial intelligence',
+          title: 'Assistente IA',
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="chat" color={color} size={size} />
           ),
         }}
       />
-
       <Tabs.Screen
         name="profile"
         options={{
@@ -60,7 +60,8 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="person" color={color} size={size} />
           ),
-        }}/>
+        }}
+      />
     </Tabs>
   );
 }

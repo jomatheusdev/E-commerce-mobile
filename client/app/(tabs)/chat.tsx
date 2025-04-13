@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   FlatList,
   Text,
@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '../../context/CartContext';
+// Importamos o evento de logout
+import { logoutEvent, LOGOUT_EVENT_NAME } from '../../context/AuthContext';
 
 // Componentes
 import MessageBalloon from '../../components/chat/MessageBalloon';
@@ -19,7 +21,8 @@ import CartModal from '../../components/chat/CartModal';
 // Hooks
 import { useAIChat } from '../../hooks/useAIChat';
 
-const Chat = () => {
+// Exportando o componente como default
+export default function ChatScreen() {
   const { addToCart, removeFromCart, clearCart, cartItems, totalValue } = useCart();
   const flatListRef = useRef<FlatList>(null);
   
@@ -38,13 +41,32 @@ const Chat = () => {
     
     setMessage,
     setAutoReconnect,
+    setShowProductList,
     setShowCartModal,
     
     sendMessage,
     manualReconnect,
     startNewConversation,
-    handleAddToCart
+    handleAddToCart,
+    disableAutoReconnect // Nova função para desabilitar reconexão
   } = useAIChat(addToCart, removeFromCart, clearCart);
+
+  // Adicionamos um efeito para escutar o evento de logout
+  useEffect(() => {
+    // Função handler para desabilitar a reconexão quando o usuário faz logout
+    const handleLogout = () => {
+      console.log('Evento de logout detectado, desabilitando reconexão WebSocket');
+      disableAutoReconnect();
+    };
+    
+    // Adicionar o listener para o evento de logout
+    logoutEvent.addEventListener(LOGOUT_EVENT_NAME, handleLogout);
+    
+    // Limpar o listener quando o componente é desmontado
+    return () => {
+      logoutEvent.removeEventListener(LOGOUT_EVENT_NAME, handleLogout);
+    };
+  }, [disableAutoReconnect]);
 
   // Scroll para o final da lista quando chegar uma nova mensagem
   const scrollToEnd = () => {
@@ -236,7 +258,7 @@ const styles = StyleSheet.create({
   },
   disconnectedText: {
     color: '#cc0000',
-    flex: 1,
+    flex:1,
   },
   apiBanner: {
     backgroundColor: '#fff3cd',
@@ -307,5 +329,3 @@ const styles = StyleSheet.create({
     backgroundColor: '#cccccc',
   },
 });
-
-export default Chat;

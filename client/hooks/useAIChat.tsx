@@ -105,9 +105,7 @@ export const useAIChat = (addToCart: (product: Product) => void, removeFromCart:
         setIsConnected(true);
         setIsLoading(false);
         setUserId(userId);
-        if (reconnectAttempts === 0) {
-          Alert.alert('Conectado', message);
-        }
+        // Removido o Alert.alert que mostrava o popup de conexão
         setReconnectAttempts(0);
       },
       onMessage: (message) => {
@@ -206,9 +204,7 @@ export const useAIChat = (addToCart: (product: Product) => void, removeFromCart:
         setIsConnected(true);
         setIsLoading(false);
         setUserId(userId);
-        if (reconnectAttempts === 0) {
-          Alert.alert('Conectado', message);
-        }
+        // Removido o Alert.alert que mostrava o popup de conexão
         setReconnectAttempts(0);
       },
       onMessage: (message) => {
@@ -375,6 +371,13 @@ export const useAIChat = (addToCart: (product: Product) => void, removeFromCart:
     showToast(`${product.name} adicionado ao carrinho`);
   };
 
+  // Nova função para desabilitar a reconexão automática (para uso após logout)
+  const disableAutoReconnect = () => {
+    setAutoReconnect(false);
+    cleanupConnection();
+    console.log('Auto-reconexão de WebSocket desabilitada após logout');
+  };
+
   return {
     // Estado
     userName,
@@ -402,6 +405,7 @@ export const useAIChat = (addToCart: (product: Product) => void, removeFromCart:
     startNewConversation,
     handleAddToCart,
     handleAddToCartById,
-    showToast
+    showToast,
+    disableAutoReconnect, // Nova função exportada
   };
 };
