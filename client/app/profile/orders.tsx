@@ -40,6 +40,59 @@ const formatCurrency = (value: any): string => {
   return Number(value).toFixed(2);
 };
 
+const formatDate = (dateString: string) => {
+  try {
+    // Verificar se a data é válida
+    let date;
+    
+    // Tenta interpretar a string em diferentes formatos
+    if (dateString) {
+      // Remove qualquer caractere 'T' ou 'Z' para aumentar compatibilidade
+      dateString = dateString.replace('T', ' ').replace('Z', '');
+      
+      // Tenta criar uma data diretamente
+      date = new Date(dateString);
+      
+      // Se a data for inválida, tenta outros formatos comuns
+      if (isNaN(date.getTime())) {
+        // Tenta formato DD/MM/YYYY
+        const parts = dateString.match(/(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})/);
+        if (parts) {
+          date = new Date(Number(parts[3]), Number(parts[2]) - 1, Number(parts[1]));
+        }
+      }
+      
+      // Se a data ainda for inválida, desiste
+      if (isNaN(date.getTime())) {
+        console.log('Data inválida recebida:', dateString);
+        throw new Error('Data inválida');
+      }
+    } else {
+      throw new Error('String de data vazia');
+    }
+    
+    return {
+      fullDate: date.toLocaleDateString('pt-BR', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric' 
+      }),
+      time: date.toLocaleTimeString('pt-BR', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      }),
+      weekday: date.toLocaleDateString('pt-BR', { weekday: 'long' })
+    };
+  } catch (error) {
+    // Fallback quando não consegue interpretar a data
+    return {
+      fullDate: new Date().toLocaleDateString('pt-BR'),
+      time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+      weekday: new Date().toLocaleDateString('pt-BR', { weekday: 'long' })
+    };
+  }
+};
+
 export default function MyOrdersScreen() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -76,12 +129,6 @@ export default function MyOrdersScreen() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR') + ' às ' + 
-           date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   };
 
   const getPaymentMethodName = (method: string) => {
@@ -141,6 +188,7 @@ export default function MyOrdersScreen() {
 
   const renderOrderItem = ({ item }: { item: Order }) => {
     const isExpanded = expandedOrder === item.id;
+    const formattedDate = formatDate(item.orderDate);
     
     return (
       <View style={styles.orderCard}>
@@ -150,7 +198,14 @@ export default function MyOrdersScreen() {
         >
           <View>
             <Text style={styles.orderId}>Pedido #{item.id}</Text>
-            <Text style={styles.orderDate}>{formatDate(item.orderDate)}</Text>
+            <View style={styles.dateContainer}>
+              <Ionicons name="calendar-outline" size={14} color="#666" style={styles.dateIcon} />
+              <Text style={styles.orderDate}>
+                {formattedDate.fullDate}
+                {formattedDate.weekday ? ` (${formattedDate.weekday})` : ''} 
+                {formattedDate.time ? ` às ${formattedDate.time}` : ''}
+              </Text>
+            </View>
           </View>
           
           <View style={styles.orderHeaderRight}>
@@ -178,17 +233,34 @@ export default function MyOrdersScreen() {
             </View>
             
             <Text style={styles.itemsTitle}>Itens do pedido:</Text>
-            {item.items.map((orderItem) => (
+            {item.items.map((orderItem, index) => (
               <View key={orderItem.id} style={styles.orderItem}>
                 <View style={styles.itemInfo}>
-                  <Text style={styles.itemName}>{orderItem.name}</Text>
-                  <Text style={styles.itemQuantity}>Quantidade: {orderItem.quantity}</Text>
+                  <Text style={styles.itemIndex}>{index + 1}.</Text>
+                  <View style={styles.itemDetails}>
+                    <Text style={styles.itemName} numberOfLines={2} ellipsizeMode="tail">
+                      {orderItem.name || 
+                       orderItem.productName || 
+                       (orderItem.Product && orderItem.Product.name) || 
+                       `Produto ${index + 1}`}
+                    </Text>
+                    <View style={styles.itemMeta}>
+                      <Text style={styles.itemQuantity}>
+                        <Text style={styles.itemQuantityLabel}>Quantidade: </Text>
+                        {orderItem.quantity}
+                      </Text>
+                      <Text style={styles.itemUnitPrice}>
+                        <Text style={styles.itemPriceLabel}>Preço unitário: </Text>
+                        R$ {formatCurrency(orderItem.price || orderItem.unitPrice)}
+                      </Text>
+                    </View>
+                  </View>
                 </View>
                 <Text style={styles.itemPrice}>
                   R$ {formatCurrency(
                     orderItem.total !== undefined
                       ? orderItem.total
-                      : (orderItem.price || 0) * (orderItem.quantity || 1)
+                      : (orderItem.price || orderItem.unitPrice || 0) * (orderItem.quantity || 1)
                   )}
                 </Text>
               </View>
@@ -343,10 +415,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
   },
+  dateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  dateIcon: {
+    marginRight: 4,
+  },
   orderDate: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#666',
-    marginTop: 2,
   },
   statusBadge: {
     paddingHorizontal: 8,
@@ -396,15 +475,43 @@ const styles = StyleSheet.create({
   },
   itemInfo: {
     flex: 1,
+    flexDirection: 'row',
+  },
+  itemIndex: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#555',
+    marginRight: 8,
+  },
+  itemDetails: {
+    flex: 1,
   },
   itemName: {
-    fontSize: 14,
+    fontSize: 15,
+    fontWeight: 'bold',
     color: '#333',
+    marginRight: 8, // Adicionado para garantir espaço adequado
+    flexShrink: 1,  // Permite que o texto seja reduzido se necessário
   },
-  itemQuantity: {
+  itemMeta: {
+    flexDirection: 'row',
+    marginTop: 4,
+    flexWrap: 'wrap',
+  },
+  itemQuantityLabel: {
+    fontSize: 12,
+    color: '#555',
+    fontWeight: 'normal',
+  },
+  itemPriceLabel: {
+    fontSize: 12,
+    color: '#555',
+    fontWeight: 'normal',
+  },
+  itemUnitPrice: {
     fontSize: 12,
     color: '#666',
-    marginTop: 2,
+    marginLeft: 10,
   },
   itemPrice: {
     fontSize: 14,
