@@ -51,6 +51,33 @@ Aplicativo de e-commerce completo desenvolvido com React Native/Expo (frontend) 
 - npm ou yarn
 - Expo CLI
 - Chave API do Google Gemini (para funcionalidades de IA)
+- Git para controle de versão
+- Banco de dados MySQL
+- Editor de código (Visual Studio Code recomendado)
+- Postman para testar API
+- Sistema operacional: Windows
+- Dispositivo móvel para testes (e emulador/simulador)
+
+#### Dependências Principais
+- **Frontend:**
+  - React Native/Expo
+  - TypeScript
+  - Axios
+  - AsyncStorage
+  - Expo Router
+  - WebSocket
+  - React Navigation
+  - Expo Vector Icons
+
+- **Backend:**
+  - Express.js
+  - Sequelize ORM
+  - JSON Web Token (JWT)
+  - ws (WebSocket)
+  - dotenv
+  - cors
+  - Google Generative AI SDK
+  - MySQL2
 
 ### Passo a Passo
 
@@ -84,14 +111,18 @@ npm run dev
 ```
 
 #### Frontend (Cliente)
-1. Configure o arquivo `config/api.ts` com o endereço do seu servidor:
+1. Encontre o endereço IP do seu computador:
+   - No Windows: Abra o prompt de comando e digite `ipconfig`. Procure pelo "Endereço IPv4" na sua conexão de rede ativa.
+   - No macOS/Linux: Abra o terminal e digite `ifconfig` ou `ip addr`. Procure pelo endereço IP na sua interface de rede (geralmente começa com 192.168).
+
+2. Configure o arquivo `config/api.ts` com o endereço do seu servidor:
 ```typescript
 // Exemplo para uso em dispositivo físico (substitua pelo IP do seu computador)
-export const SERVER_URL = 'http://ip:3000';
-export const WEBSOCKET_URL = 'ws://ip:3000';
+export const SERVER_URL = 'http://192.168.x.x:3000';
+export const WEBSOCKET_URL = 'ws://192.168.x.x:3000';
 ```
 
-2. Instale as dependências e inicie o aplicativo:
+3. Instale as dependências e inicie o aplicativo:
 ```bash
 cd client
 npm install
