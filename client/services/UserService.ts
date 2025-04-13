@@ -22,6 +22,12 @@ export interface RegisterUserData {
   confirmPassword: string;
 }
 
+export interface UpdateUserData {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export class UserService {
   static async login(email: string, password: string): Promise<AuthResponse> {
     const response = await axios.post(API_ENDPOINTS.login, { email, password });
@@ -64,6 +70,22 @@ export class UserService {
       console.error('Erro ao buscar usuário atual:', error);
       return null;
     }
+  }
+
+  static async updateProfile(userData: UpdateUserData): Promise<User> {
+    const token = await AsyncStorage.getItem('authToken');
+    if (!token) {
+      throw new Error('Usuário não autenticado');
+    }
+
+    const response = await axios.put(
+      API_ENDPOINTS.user(userData.id), 
+      userData,
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+    );
+    return response.data;
   }
 }
 

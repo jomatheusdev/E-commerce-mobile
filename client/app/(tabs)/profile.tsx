@@ -106,12 +106,18 @@ export default function ProfileScreen() {
       </View>
       
       <View style={styles.section}>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity 
+          style={styles.button}
+          onPress={() => router.push('/profile/edit')}
+        >
           <Ionicons name="create-outline" size={20} color="#FFF" style={styles.buttonIcon} />
           <Text style={styles.buttonText}>Editar Perfil</Text>
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity 
+          style={styles.button}
+          onPress={() => router.push('/profile/orders')}
+        >
           <Ionicons name="list-outline" size={20} color="#FFF" style={styles.buttonIcon} />
           <Text style={styles.buttonText}>Meus Pedidos</Text>
         </TouchableOpacity>
