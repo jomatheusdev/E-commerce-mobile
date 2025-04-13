@@ -19,7 +19,7 @@ interface OrderItem {
   name: string;
   price: number;
   quantity: number;
-  total: number;
+  total?: number; // Tornando o campo total opcional
 }
 
 interface Order {
@@ -30,6 +30,15 @@ interface Order {
   paymentMethod: string;
   items: OrderItem[];
 }
+
+// Função auxiliar para formatar valores monetários com segurança
+const formatCurrency = (value: any): string => {
+  // Verifica se o valor é nulo, indefinido ou não é um número
+  if (value === null || value === undefined || isNaN(Number(value))) {
+    return "0.00";
+  }
+  return Number(value).toFixed(2);
+};
 
 export default function MyOrdersScreen() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -160,7 +169,7 @@ export default function MyOrdersScreen() {
           <View style={styles.orderDetails}>
             <View style={styles.orderInfo}>
               <Text style={styles.infoLabel}>Total:</Text>
-              <Text style={styles.infoValue}>R$ {item.total.toFixed(2)}</Text>
+              <Text style={styles.infoValue}>R$ {formatCurrency(item.total)}</Text>
             </View>
             
             <View style={styles.orderInfo}>
@@ -176,7 +185,11 @@ export default function MyOrdersScreen() {
                   <Text style={styles.itemQuantity}>Quantidade: {orderItem.quantity}</Text>
                 </View>
                 <Text style={styles.itemPrice}>
-                  R$ {orderItem.total.toFixed(2)}
+                  R$ {formatCurrency(
+                    orderItem.total !== undefined
+                      ? orderItem.total
+                      : (orderItem.price || 0) * (orderItem.quantity || 1)
+                  )}
                 </Text>
               </View>
             ))}
