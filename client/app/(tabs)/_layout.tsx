@@ -2,7 +2,6 @@ import React from 'react';
 import { Tabs } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Button, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 
@@ -20,11 +19,6 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      screenOptions={{
-        headerRight: () => (
-          <Button title="Logout" onPress={handleLogout} color="#007bff" />
-        ),
-      }}
     >
       <Tabs.Screen
         name="index"
