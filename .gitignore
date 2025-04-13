@@ -6,17 +6,7 @@ yarn-error.log*
 package-lock.json
 yarn.lock
 
-# Expo
-.expo/
-.expo-shared/
-web-build/
-dist/
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
-*.orig.*
+
 
 # Variáveis de ambiente
 .env
