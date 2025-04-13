@@ -1,3 +1,5 @@
+import { WEBSOCKET_URL } from '../config/api';
+
 interface Message {
   id: string;
   userId: string;
@@ -23,7 +25,7 @@ export interface AIServiceEvents {
 export class AIService {
   private ws: WebSocket | null = null;
   private sessionId: string = '';
-  private serverUrl: string = 'ws://192.168.0.105:3000';
+  private serverUrl: string = WEBSOCKET_URL;
   private events: AIServiceEvents;
   private userName: string;
   private authToken: string | null = null;

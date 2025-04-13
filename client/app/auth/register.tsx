@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import httpService from '../services/httpService';
-
+import { API_ENDPOINTS } from '../../config/api';
 
 export default function RegisterScreen() {
   const router = useRouter();
-  const SERVER_URL = 'http://192.168.0.105:3000'
   const [name, setName] = useState('');
   const [cpf, setCpf] = useState('');
   const [email, setEmail] = useState('');
@@ -18,14 +17,12 @@ export default function RegisterScreen() {
       name,cpf,email,password,confirmPassword,
     }
     console.log('json',json)
-      const createProductUrl = `${SERVER_URL}/api/user`;
     try {
-      const result = await httpService.post(createProductUrl,json)
+      const result = await httpService.post(API_ENDPOINTS.register, json)
 
     }catch (error) {
       //  mostrar um tooltip de erro 
     }
-  
   }
 
   const validarEmail = (email: string) => {

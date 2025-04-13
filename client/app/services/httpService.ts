@@ -1,4 +1,8 @@
 import axios from 'axios';
+import { SERVER_URL } from '../../config/api';
+
+// Configurar axios com URL base
+axios.defaults.baseURL = SERVER_URL;
 
 const service = {
   get: (url: string) => {

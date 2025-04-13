@@ -3,6 +3,7 @@ import { Alert, Platform, ToastAndroid } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { AIService, decodeJWT } from '../services/AIService';
+import { API_ENDPOINTS } from '../config/api';
 
 interface Message {
   id: string;
@@ -59,8 +60,7 @@ export const useAIChat = (addToCart: (product: Product) => void, removeFromCart:
         if (payload && payload.id) {
           const userId = payload.id;
           try {
-            const SERVER_URL = 'http://192.168.0.105:3000';
-            const response = await axios.get(`${SERVER_URL}/api/user/${userId}`, {
+            const response = await axios.get(API_ENDPOINTS.user(userId), {
               headers: { Authorization: `Bearer ${token}` }
             });
             
@@ -348,15 +348,13 @@ export const useAIChat = (addToCart: (product: Product) => void, removeFromCart:
   // Função para adicionar produto ao carrinho por ID
   const handleAddToCartById = async (productId: string) => {
     try {
-      const SERVER_URL = 'http://192.168.0.105:3000';
-      
       const token = await AsyncStorage.getItem('authToken');
       if (!token) {
         showToast('Você precisa estar logado para adicionar produtos ao carrinho');
         return;
       }
       
-      const response = await axios.get(`${SERVER_URL}/api/product/${productId}`, {
+      const response = await axios.get(API_ENDPOINTS.product(productId), {
         headers: { Authorization: `Bearer ${token}` }
       });
       

@@ -76,3 +76,8 @@ logs
 # Caches
 .cache/
 .npm/
+
+
+# VsCode
+.vscode/*
+!.vscode/extensions.json

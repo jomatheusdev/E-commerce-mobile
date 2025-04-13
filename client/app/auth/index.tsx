@@ -3,10 +3,10 @@ import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Alert } fr
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 import { useRouter } from 'expo-router';
 import httpService from '../services/httpService';
+import { API_ENDPOINTS } from '../../config/api';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const SERVER_URL = 'http://192.168.0.105:3000';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -22,8 +22,7 @@ export default function LoginScreen() {
     }
 
     try {
-      const loginUrl = `${SERVER_URL}/api/login`;
-      const response = await httpService.post(loginUrl, { email, password });
+      const response = await httpService.post(API_ENDPOINTS.login, { email, password });
       const { token } = response.data;
 
       // Salvar o token no AsyncStorage

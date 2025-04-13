@@ -3,6 +3,7 @@ import { View, Text, FlatList, StyleSheet, SafeAreaView, ActivityIndicator } fro
 import ProductCard from '../../components/Product';
 import { useCart } from '../../context/CartContext';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../../config/api';
 
 interface Product {
   id: string;
@@ -26,8 +27,7 @@ export default function HomeScreen() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const SERVER_URL = 'http://192.168.0.105:3000';
-      const response = await axios.get(`${SERVER_URL}/api/public/products`);
+      const response = await axios.get(API_ENDPOINTS.products);
       
       // Adiciona uma URL de imagem padrão aos produtos do banco
       const productsWithImages = response.data.map((product: any) => ({

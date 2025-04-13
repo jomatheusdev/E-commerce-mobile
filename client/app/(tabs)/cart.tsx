@@ -14,6 +14,7 @@ import { useCart } from '../../context/CartContext';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../../config/api';
 
 interface PaymentMethod {
   id: string;
@@ -26,7 +27,6 @@ export default function CartScreen() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
   const [showPaymentMethods, setShowPaymentMethods] = useState(false);
-  const SERVER_URL = 'http://192.168.0.105:3000';
   
   const paymentMethods: PaymentMethod[] = [
     { id: 'credit', name: 'Cartão de Crédito', icon: 'card-outline' },
@@ -91,7 +91,7 @@ export default function CartScreen() {
       
       // Enviar pedido para o servidor
       const response = await axios.post(
-        `${SERVER_URL}/api/orders`,
+        API_ENDPOINTS.orders,
         {
           items,
           total,

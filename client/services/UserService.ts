@@ -1,7 +1,6 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const SERVER_URL = 'http://192.168.0.105:3000';
+import { SERVER_URL, API_ENDPOINTS } from '../config/api';
 
 export interface AuthResponse {
   token: string;
@@ -25,12 +24,12 @@ export interface RegisterUserData {
 
 export class UserService {
   static async login(email: string, password: string): Promise<AuthResponse> {
-    const response = await axios.post(`${SERVER_URL}/api/login`, { email, password });
+    const response = await axios.post(API_ENDPOINTS.login, { email, password });
     return response.data;
   }
 
   static async register(userData: RegisterUserData): Promise<void> {
-    await axios.post(`${SERVER_URL}/api/user`, userData);
+    await axios.post(API_ENDPOINTS.register, userData);
   }
 
   static async getUserInfo(userId: string): Promise<User> {
@@ -39,7 +38,7 @@ export class UserService {
       throw new Error('Usuário não autenticado');
     }
 
-    const response = await axios.get(`${SERVER_URL}/api/user/${userId}`, {
+    const response = await axios.get(API_ENDPOINTS.user(userId), {
       headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;
