@@ -3,10 +3,10 @@
  */
 
 // URL base do servidor
-export const SERVER_URL = 'http://192.168.0.108:3000';
+export const SERVER_URL = 'http://192.168.18.224:3000';
 
 // URL WebSocket para o serviço de IA
-export const WEBSOCKET_URL = 'ws://192.168.0.108:3000';
+export const WEBSOCKET_URL = 'ws://192.168.18.224:3000';
 
 // Endpoints específicos da API
 export const API_ENDPOINTS = {

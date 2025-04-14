@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
+import jwt_decode from 'jwt-decode'; // Adicione esta biblioteca ao projeto se não tiver
 
 // Tipo para os dados do usuário autenticado
 type AuthUser = {
@@ -67,10 +68,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const token = await AsyncStorage.getItem('authToken');
       if (token) {
-        // Aqui você pode decodificar o token JWT para obter as informações do usuário
-        // Ou fazer uma chamada de API para obter dados do usuário
-        // Para simplificar, vamos apenas definir o usuário como autenticado
-        setUser({ id: '1', name: 'Usuário Autenticado', email: 'user@example.com' });
+        // Decodificar o token JWT
+        try {
+          const decoded: any = jwt_decode(token);
+          // Verificar se o token expirou
+          const currentTime = Date.now() / 1000;
+          if (decoded.exp && decoded.exp < currentTime) {
+            // Token expirado, fazer logout
+            await logout();
+          } else {
+            // Token válido, definir usuário
+            setUser({
+              id: decoded.id || '1',
+              name: decoded.name || 'Usuário',
+              email: decoded.email || 'user@example.com'
+            });
+          }
+        } catch (decodeError) {
+          console.error('Erro ao decodificar token:', decodeError);
+          await logout();
+        }
       }
     } catch (error) {
       console.error('Erro ao verificar autenticação:', error);

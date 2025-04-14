@@ -1,19 +1,29 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
+import { useAuth } from '../../context/AuthContext';
 import httpService from '../services/httpService';
 import { API_ENDPOINTS } from '../../config/api';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { login, isAuthenticated, isLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [localLoading, setLocalLoading] = useState(false);
 
   const validarEmail = (email: string) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
   };
+
+  // Redirecionar se já estiver autenticado
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace('/(tabs)');
+    }
+  }, [isAuthenticated, router]);
 
   const handleLogin = async () => {
     if (!validarEmail(email)) {
@@ -21,19 +31,30 @@ export default function LoginScreen() {
       return;
     }
 
+    setLocalLoading(true);
     try {
       const response = await httpService.post(API_ENDPOINTS.login, { email, password });
       const { token } = response.data;
 
-      // Salvar o token no AsyncStorage
-      await AsyncStorage.setItem('authToken', token);
-
-      Alert.alert('Sucesso', 'Login realizado com sucesso!');
+      // Usar a função login do contexto para gerenciar a autenticação
+      await login(token);
       router.replace('/(tabs)');
     } catch (error) {
       Alert.alert('Erro', 'Credenciais inválidas ou erro no servidor.');
+    } finally {
+      setLocalLoading(false);
     }
   };
+
+  // Mostrar indicador de carregamento enquanto verifica autenticação
+  if (isLoading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color="#007bff" />
+        <Text style={{ marginTop: 10 }}>Verificando autenticação...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -51,7 +72,11 @@ export default function LoginScreen() {
         secureTextEntry
         onChangeText={setPassword}
       />
-      <Button title="Entrar" onPress={handleLogin} />
+      {localLoading ? (
+        <ActivityIndicator size="small" color="#007bff" style={{ marginTop: 20 }} />
+      ) : (
+        <Button title="Entrar" onPress={handleLogin} />
+      )}
       <TouchableOpacity onPress={() => router.push('/auth/register')}>
         <Text style={styles.registrar}>Não tem login? Registre-se</Text>
       </TouchableOpacity>

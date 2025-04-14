@@ -9,7 +9,6 @@ import {
   Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { UserService, User } from '../../services/UserService';
 import { useAuth } from '../../context/AuthContext';
