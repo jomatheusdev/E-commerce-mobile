@@ -78,7 +78,8 @@ export default function ProfileScreen() {
       <View style={styles.header}>
         <View style={styles.avatarContainer}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{user.name.charAt(0).toUpperCase()}</Text>
+            <Ionicons name="person" size={40} color="#007bff" />
+            {/* Alternativa ao texto da primeira letra do nome */}
           </View>
         </View>
         <Text style={styles.userName}>{user.name}</Text>
